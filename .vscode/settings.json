@@ -4,5 +4,6 @@
   "editor.formatOnType": true,
   "editor.renderControlCharacters": true,
   "editor.detectIndentation": false,
-  "editor.renderWhitespace": "boundary"
+  "editor.renderWhitespace": "boundary",
+  "C_Cpp.errorSquiggles": "disabled"
 }
