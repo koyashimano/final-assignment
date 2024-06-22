@@ -11,7 +11,9 @@
 #define _C99_SOURCE
 #endif
 
+#ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE
+#endif
 // #define _POSIX_C_SOURCE 199309L
 
 #include <stdio.h>
@@ -32,48 +34,48 @@
 float *load_mnist_bmp(const char *filename, ...);
 void save_mnist_bmp(const float *x, const char *filename, ...);
 
-// #ifdef __MINGW32__
-// // http://www.ecs.shimane-u.ac.jp/~stamura/MinGW-gsl.html
-// #include <float.h>
-// static void __attribute__((constructor)) trapfpe()
-// {
-//     _controlfp(~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW), _MCW_EM);
-// }
-// #else
+#ifdef __MINGW32__
+// http://www.ecs.shimane-u.ac.jp/~stamura/MinGW-gsl.html
+#include <float.h>
+static void __attribute__((constructor)) trapfpe()
+{
+    _controlfp(~(_EM_INVALID | _EM_ZERODIVIDE | _EM_OVERFLOW), _MCW_EM);
+}
+#else
 
-// #if defined(__APPLE__) && defined(__MACH__)
-// // https://stackoverflow.com/questions/37819235/how-do-you-enable-floating-point-exceptions-for-clang-in-os-x
+#if defined(__APPLE__) && defined(__MACH__)
+// https://stackoverflow.com/questions/37819235/how-do-you-enable-floating-point-exceptions-for-clang-in-os-x
 
-// // Public domain polyfill for feenableexcept on OS X
-// // http://www-personal.umich.edu/~williams/archive/computation/fe-handling-example.c
-// static inline int feenableexcept(unsigned int excepts)
-// {
-//     static fenv_t fenv;
-//     unsigned int new_excepts = excepts & FE_ALL_EXCEPT;
-//     // previous masks
-//     unsigned int old_excepts;
+// Public domain polyfill for feenableexcept on OS X
+// http://www-personal.umich.edu/~williams/archive/computation/fe-handling-example.c
+static inline int feenableexcept(unsigned int excepts)
+{
+    static fenv_t fenv;
+    unsigned int new_excepts = excepts & FE_ALL_EXCEPT;
+    // previous masks
+    unsigned int old_excepts;
 
-//     if (fegetenv(&fenv))
-//     {
-//         return -1;
-//     }
-//     old_excepts = fenv.__control & FE_ALL_EXCEPT;
+    if (fegetenv(&fenv))
+    {
+        return -1;
+    }
+    old_excepts = fenv.__control & FE_ALL_EXCEPT;
 
-//     // unmask
-//     fenv.__control &= ~new_excepts;
-//     fenv.__mxcsr &= ~(new_excepts << 7);
+    // unmask
+    fenv.__control &= ~new_excepts;
+    fenv.__mxcsr &= ~(new_excepts << 7);
 
-//     return fesetenv(&fenv) ? -1 : old_excepts;
-// }
-// #endif
+    return fesetenv(&fenv) ? -1 : old_excepts;
+}
+#endif
 
-// // int feenableexcept(int excepts);
-// static void __attribute__((constructor)) trapfpe()
-// {
-//     /* Enable some exceptions.  At startup all exceptions are masked.  */
-//     feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
-// }
-// #endif
+// int feenableexcept(int excepts);
+static void __attribute__((constructor)) trapfpe()
+{
+    /* Enable some exceptions.  At startup all exceptions are masked.  */
+    feenableexcept(FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW);
+}
+#endif
 
 uint32_t ntohl(uint32_t const net)
 {
