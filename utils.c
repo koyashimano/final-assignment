@@ -40,6 +40,16 @@ void scale(int n, float x, float *o) {
     }
 }
 
+/// 与えられた勾配の値によってパラメータを最適化する
+/// `lr`: 学習率
+/// `batch_size`: ミニバッチサイズ
+/// `ave_dEdx`: バッチ計算による勾配の合計値を表す長さ`size`の配列
+/// `x`: 最適化させるパラメータである長さ`size`の配列
+void optimize(int size, float lr, int batch_size, float *ave_dEdx, float *x) {
+    scale(size, -lr / batch_size, ave_dEdx);
+    add(size, ave_dEdx, x);
+}
+
 /// 長さ`n`の配列`o`の値を全て`x`にする
 void init(int n, float x, float *o) {
     int i;

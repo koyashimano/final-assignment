@@ -116,19 +116,12 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
                 add(NUM_DIGITS, dEdb3, ave_dEdb3);
             }
 
-            scale(DIM_Y1 * IMAGE_SIZE, -lr / n, ave_dEdA1);
-            scale(DIM_Y1, -lr / n, ave_dEdb1);
-            scale(DIM_Y2 * DIM_Y1, -lr / n, ave_dEdA2);
-            scale(DIM_Y2, -lr / n, ave_dEdb2);
-            scale(NUM_DIGITS * DIM_Y2, -lr / n, ave_dEdA3);
-            scale(NUM_DIGITS, -lr / n, ave_dEdb3);
-
-            add(DIM_Y1 * IMAGE_SIZE, ave_dEdA1, A1);
-            add(DIM_Y1, ave_dEdb1, b1);
-            add(DIM_Y2 * DIM_Y1, ave_dEdA2, A2);
-            add(DIM_Y2, ave_dEdb2, b2);
-            add(NUM_DIGITS * DIM_Y2, ave_dEdA3, A3);
-            add(NUM_DIGITS, ave_dEdb3, b3);
+            optimize(DIM_Y1 * IMAGE_SIZE, lr, n, ave_dEdA1, A1);
+            optimize(DIM_Y1, lr, n, ave_dEdb1, b1);
+            optimize(DIM_Y2 * DIM_Y1, lr, n, ave_dEdA2, A2);
+            optimize(DIM_Y2, lr, n, ave_dEdb2, b2);
+            optimize(NUM_DIGITS * DIM_Y2, lr, n, ave_dEdA3, A3);
+            optimize(NUM_DIGITS, lr, n, ave_dEdb3, b3);
         }
         printf(
             "[epoch%3d] loss: %9f  correct answer rate: %9f%%\n", i + 1,
