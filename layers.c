@@ -2,11 +2,11 @@
 
 #include <math.h>
 
-/// float型の1次元配列`A`として与えられた(`m`,`n`)行列、
-/// float型の1次元配列として与えられた`m`行の列ベクトル`b`、
-/// float型の1次元配列として与えられた`n`行の列ベクトル`x`
-/// が入力されたときに、Ax + bを計算し、その結果を
-/// float型の1次元配列として与えられた`m`行の列ベクトル`y`に書き込む
+/// Ax + bを計算する
+/// `x`: `n`行の列ベクトルを表す長さ`n`のfloat型配列
+/// `A`: (`m`,`n`)行列を表す長さ`m * n`のfloat型配列
+/// `b`: `m`行の列ベクトルを表す長さ`m`のfloat型配列
+/// `y`: 計算結果を格納するための長さ`m`のfloat型配列
 void fc(int m, int n, const float *x, const float *A, const float *b,
         float *y) {
     int i, j;
@@ -20,9 +20,10 @@ void fc(int m, int n, const float *x, const float *A, const float *b,
     }
 }
 
-/// float型の1次元配列として与えられた`n`行の列ベクトル`x`が入力されたときに、
-/// 0より小さい値は0にし、それ以外はそのままにする計算を行い、
-/// float型の1次元配列として与えられた`n`行の列ベクトル`y`に書き込む
+/// ベクトルxの各要素に対して0より小さい値は0にし、
+/// それ以外はそのままにする計算を行う
+/// `x`: `n`行の列ベクトルを表す長さ`n`のfloat型配列
+/// `y`: 計算結果を格納するための長さ`n`のfloat型配列
 void relu(int n, const float *x, float *y) {
     int i;
     for (i = 0; i < n; i++) {
@@ -30,9 +31,9 @@ void relu(int n, const float *x, float *y) {
     }
 }
 
-/// float型の1次元配列として与えられた`n`行の列ベクトル`x`に
-/// ソフトマックス関数を作用させ、その結果を
-/// float型の1次元配列として与えられた`n`行の列ベクトル`y`に書き込む
+/// ベクトルxにソフトマックス関数を作用させる
+/// `x`: `n`行の列ベクトルを表す長さ`n`のfloat型配列
+/// `y`: 計算結果を格納するための長さ`n`のfloat型配列
 void softmax(int n, const float *x, float *y) {
     int i;
     float x_max = x[0];
@@ -55,9 +56,10 @@ void softmax(int n, const float *x, float *y) {
     }
 }
 
-/// Softmax層逆伝播:
-/// float型の1次元配列として与えられた`n`行の列ベクトル`y`、
-/// 正解を表す数字tに対して、偏微分dE/dxを計算する
+/// Softmax層の逆伝播を行う
+/// `y`: Softmax層の出力である長さ`n`のfloat型配列
+/// `t`: 訓練データの画像中に書かれた数字
+/// `dEdx`: 損失の偏微分の計算結果を格納するための長さ`n`のfloat型配列
 void softmaxwithloss_bwd(int n, const float *y, unsigned char t, float *dEdx) {
     int i;
     for (i = 0; i < n; i++) {
@@ -65,7 +67,10 @@ void softmaxwithloss_bwd(int n, const float *y, unsigned char t, float *dEdx) {
     }
 }
 
-/// ReLU層: `dEdy` -> `dEdx`
+/// ReLU層の逆伝播を行う
+/// `x`: 順方向の入力である長さ`n`のfloat型配列
+/// `dEdy`: 上層の偏微分結果である長さ`n`のfloat型配列
+/// `dEdx`: 損失の偏微分の計算結果を格納するための長さ`n`のfloat型配列
 void relu_bwd(int n, const float *x, const float *dEdy, float *dEdx) {
     int i;
     for (i = 0; i < n; i++) {
@@ -73,10 +78,12 @@ void relu_bwd(int n, const float *x, const float *dEdy, float *dEdx) {
     }
 }
 
-/// FC層: float型の1次元配列`A`として与えられた(`m`,`n`)行列、
-/// `x`: (1, `m`)
-/// `dEdy`: (`n`, 1)
-/// float型の1次元配列`dEdA`として(`m`,`n`)行列
+/// FC層の逆伝播を行う
+/// `x`: 順方向の入力である長さ`m`のfloat型配列
+/// `dEdy`: 上層の偏微分結果である長さ`n`のfloat型配列
+/// `A`: (`m`,`n`)行列を表す長さ`m * n`のfloat型配列
+/// `dEdA`, `dEdb`, `dEdx`: 各パラメータによる損失の偏微分の計算結果を
+/// 格納するためのfloat型配列
 void fc_bwd(int m, int n, const float *x, const float *dEdy, const float *A,
             float *dEdA, float *dEdb, float *dEdx) {
     int i, j;
@@ -100,7 +107,9 @@ void fc_bwd(int m, int n, const float *x, const float *dEdy, const float *A,
     }
 }
 
-/// 損失関数: NUM_DIGITS行の列ベクトル`y`, `t`
+/// 出力yを正解と比較して損失を計算する
+/// `y`: 長さ`NUM_DIGITS`のfloat型配列
+/// `t`: 正解の数字
 float cross_entropy_error(const float *y, int t) {
     float eps = 1e-7;
     return -t * log(y[t] + eps);

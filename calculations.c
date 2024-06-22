@@ -5,6 +5,14 @@
 #include "layers.h"
 #include "main.h"
 
+/// 誤差逆伝播によって勾配を計算する
+/// `A1`, `A2`, `A3`: 重み
+/// `b1`, `b2`, `b3`: バイアス
+/// `x`: 訓練データ
+/// `t`: 訓練データが表す数字
+/// `y`: 出力
+/// `dEdA1`, `dEdb1`, `dEdA2`, `dEdb2`, `dEdA3`, `dEdb3`:
+/// 損失関数の各パラメータによる偏微分を格納するための配列
 void backward6(const float *A1, const float *b1, const float *A2,
                const float *b2, const float *A3, const float *b3,
                const float *x, unsigned char t, float *y, float *dEdA1,
@@ -28,6 +36,11 @@ void backward6(const float *A1, const float *b1, const float *A2,
     fc_bwd(DIM_Y1, IMAGE_SIZE, x, dEdx2, A1, dEdA1, dEdb1, dEdx1);
 }
 
+/// データとして与えられた画像中の数字を認識する
+/// `A1`, `A2`, `A3`: 重み
+/// `b1`, `b2`, `b3`: バイアス
+/// `x`: 画像を配列に変換したもの
+/// 返り値: 画像に書かれている数字の推論結果
 int inference6(const float *A1, const float *b1, const float *A2,
                const float *b2, const float *A3, const float *b3,
                const float *x) {
