@@ -12,7 +12,11 @@
 int main(int argc, char *argv[]) {
     if (argc <= 1) {
         printf("number recognition by deep-learning\n\n");
-        printf("commands:\n train\n inference\n");
+        printf(
+            "commands:\n"
+            " train <data_file_1> <data_file_2> <data_file_3>\n"
+            " inference <image_bmp_file> <data_file_1> <data_file_2> "
+            "<data_file_3>\n");
         return 0;
     }
 
@@ -24,7 +28,7 @@ int main(int argc, char *argv[]) {
     int test_count = -1;
     int width = -1;
     int height = -1;
-    const char *data_file_names[] = {"fc1.dat", "fc2.dat", "fc3.dat"};
+    const char *data_file_names[3];
 
     srand(time(NULL));
 
@@ -32,17 +36,27 @@ int main(int argc, char *argv[]) {
                &width, &height);
 
     if (strcmp(argv[1], "train") == 0) {
+        if (argc < 5) {
+            printf("specify 3 data files\n");
+            return 1;
+        }
+        data_file_names[0] = argv[2];
+        data_file_names[1] = argv[3];
+        data_file_names[2] = argv[4];
         train(train_count, train_x, train_y, test_x, test_y, test_count,
               data_file_names);
         return 0;
     }
 
     if (strcmp(argv[1], "inference") == 0) {
-        if (argc == 2) {
-            printf("specify the bpm image file\n");
+        if (argc < 6) {
+            printf("specify the bpm image file and 3 data files\n");
             return 1;
         }
         float *x = load_mnist_bmp(argv[2]);
+        data_file_names[0] = argv[3];
+        data_file_names[1] = argv[4];
+        data_file_names[2] = argv[5];
         printf("%d\n", inference(x, data_file_names));
 
         return 0;
