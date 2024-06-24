@@ -5,6 +5,8 @@ void print(int m, int n, const float *x);
 void add(int n, const float *x, float *o);
 void scale(int n, float x, float *o);
 void optimize(int size, float lr, int batch_size, float *ave_dEdx, float *x);
+void optimize_ada_grad(int size, float lr, int batch_size, float *ave_dEdx,
+                       float *x, float *h);
 void init(int n, float x, float *o);
 void rand_init(int n, float *o);
 void shuffle(int n, int *x);

@@ -78,6 +78,12 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
     float *ave_dEdb2 = malloc(sizeof(float) * DIM_Y2);
     float *ave_dEdA3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
     float *ave_dEdb3 = malloc(sizeof(float) * NUM_DIGITS);
+    float *h_A1 = malloc(sizeof(float) * 50 * IMAGE_SIZE);
+    float *h_b1 = malloc(sizeof(float) * 50);
+    float *h_A2 = malloc(sizeof(float) * DIM_Y2 * DIM_Y1);
+    float *h_b2 = malloc(sizeof(float) * DIM_Y2);
+    float *h_A3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
+    float *h_b3 = malloc(sizeof(float) * NUM_DIGITS);
     float *y = malloc(sizeof(float) * NUM_DIGITS);
     int indexes[N];
     int index, i, j, k;
@@ -88,6 +94,13 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
     rand_init(DIM_Y2, b2);
     rand_init(NUM_DIGITS * DIM_Y2, A3);
     rand_init(NUM_DIGITS, b3);
+
+    init(DIM_Y1 * IMAGE_SIZE, 0, h_A1);
+    init(DIM_Y1, 0, h_b1);
+    init(DIM_Y2 * DIM_Y1, 0, h_A2);
+    init(DIM_Y2, 0, h_b2);
+    init(NUM_DIGITS * DIM_Y2, 0, h_A3);
+    init(NUM_DIGITS, 0, h_b3);
 
     for (i = 0; i < epoch_num; i++) {
         for (j = 0; j < N; j++) {
@@ -116,12 +129,12 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
                 add(NUM_DIGITS, dEdb3, ave_dEdb3);
             }
 
-            optimize(DIM_Y1 * IMAGE_SIZE, lr, n, ave_dEdA1, A1);
-            optimize(DIM_Y1, lr, n, ave_dEdb1, b1);
-            optimize(DIM_Y2 * DIM_Y1, lr, n, ave_dEdA2, A2);
-            optimize(DIM_Y2, lr, n, ave_dEdb2, b2);
-            optimize(NUM_DIGITS * DIM_Y2, lr, n, ave_dEdA3, A3);
-            optimize(NUM_DIGITS, lr, n, ave_dEdb3, b3);
+            optimize_ada_grad(DIM_Y1 * IMAGE_SIZE, lr, n, ave_dEdA1, A1, h_A1);
+            optimize_ada_grad(DIM_Y1, lr, n, ave_dEdb1, b1, h_b1);
+            optimize_ada_grad(DIM_Y2 * DIM_Y1, lr, n, ave_dEdA2, A2, h_A2);
+            optimize_ada_grad(DIM_Y2, lr, n, ave_dEdb2, b2, h_b2);
+            optimize_ada_grad(NUM_DIGITS * DIM_Y2, lr, n, ave_dEdA3, A3, h_A3);
+            optimize_ada_grad(NUM_DIGITS, lr, n, ave_dEdb3, b3, h_b3);
         }
         printf(
             "[epoch%3d] loss: %9f  correct answer rate: %9f%%\n", i + 1,
@@ -151,6 +164,12 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
     free(ave_dEdb2);
     free(ave_dEdA3);
     free(ave_dEdb3);
+    free(h_A1);
+    free(h_b1);
+    free(h_A2);
+    free(h_b2);
+    free(h_A3);
+    free(h_b3);
     free(y);
 }
 

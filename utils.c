@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,6 +48,26 @@ void scale(int n, float x, float *o) {
 /// `x`: 最適化させるパラメータである長さ`size`の配列
 void optimize(int size, float lr, int batch_size, float *ave_dEdx, float *x) {
     scale(size, -lr / batch_size, ave_dEdx);
+    add(size, ave_dEdx, x);
+}
+
+/// AdaGradを利用して与えられた勾配の値によってパラメータを最適化する
+/// `lr`: 学習率
+/// `batch_size`: ミニバッチサイズ
+/// `ave_dEdx`: バッチ計算による勾配の合計値を表す長さ`size`の配列
+/// `x`: 最適化させるパラメータである長さ`size`の配列
+/// `h`: パラメータの各値の更新度合いを表す長さ`size`の配列
+void optimize_ada_grad(int size, float lr, int batch_size, float *ave_dEdx,
+                       float *x, float *h) {
+    int i;
+
+    for (i = 0; i < size; i++) {
+        h[i] += (ave_dEdx[i] / batch_size) * (ave_dEdx[i] / batch_size);
+    }
+    scale(size, -lr / batch_size, ave_dEdx);
+    for (i = 0; i < size; i++) {
+        ave_dEdx[i] /= sqrt(h[i] + 1e-7);
+    }
     add(size, ave_dEdx, x);
 }
 
