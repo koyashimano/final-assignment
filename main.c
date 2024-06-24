@@ -69,8 +69,8 @@ void train(const char **data_file_names) {
     float lr = 0.1;  // learning rate
     int N = train_count;
 
-    float *A1 = malloc(sizeof(float) * 50 * IMAGE_SIZE);
-    float *b1 = malloc(sizeof(float) * 50);
+    float *A1 = malloc(sizeof(float) * DIM_Y1 * IMAGE_SIZE);
+    float *b1 = malloc(sizeof(float) * DIM_Y1);
     float *A2 = malloc(sizeof(float) * DIM_Y2 * DIM_Y1);
     float *b2 = malloc(sizeof(float) * DIM_Y2);
     float *A3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
@@ -87,8 +87,8 @@ void train(const char **data_file_names) {
     float *ave_dEdb2 = malloc(sizeof(float) * DIM_Y2);
     float *ave_dEdA3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
     float *ave_dEdb3 = malloc(sizeof(float) * NUM_DIGITS);
-    float *h_A1 = malloc(sizeof(float) * 50 * IMAGE_SIZE);
-    float *h_b1 = malloc(sizeof(float) * 50);
+    float *h_A1 = malloc(sizeof(float) * DIM_Y1 * IMAGE_SIZE);
+    float *h_b1 = malloc(sizeof(float) * DIM_Y1);
     float *h_A2 = malloc(sizeof(float) * DIM_Y2 * DIM_Y1);
     float *h_b2 = malloc(sizeof(float) * DIM_Y2);
     float *h_A3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
@@ -185,17 +185,17 @@ void train(const char **data_file_names) {
 }
 
 int inference(const float *x, const char **data_file_names) {
-    float *A1 = malloc(sizeof(float) * 50 * IMAGE_SIZE);
-    float *b1 = malloc(sizeof(float) * 50);
+    float *A1 = malloc(sizeof(float) * DIM_Y1 * IMAGE_SIZE);
+    float *b1 = malloc(sizeof(float) * DIM_Y1);
     float *A2 = malloc(sizeof(float) * DIM_Y2 * DIM_Y1);
     float *b2 = malloc(sizeof(float) * DIM_Y2);
     float *A3 = malloc(sizeof(float) * NUM_DIGITS * DIM_Y2);
     float *b3 = malloc(sizeof(float) * NUM_DIGITS);
     int ans;
 
-    load(data_file_names[0], 50, 784, A1, b1);
-    load(data_file_names[1], 100, 50, A2, b2);
-    load(data_file_names[2], 10, 100, A3, b3);
+    load(data_file_names[0], DIM_Y1, IMAGE_SIZE, A1, b1);
+    load(data_file_names[1], DIM_Y2, DIM_Y1, A2, b2);
+    load(data_file_names[2], NUM_DIGITS, DIM_Y2, A3, b3);
 
     ans = inference6(A1, b1, A2, b2, A3, b3, x);
 
