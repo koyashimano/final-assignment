@@ -20,44 +20,29 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    float *train_x = NULL;
-    unsigned char *train_y = NULL;
-    int train_count = -1;
-    float *test_x = NULL;
-    unsigned char *test_y = NULL;
-    int test_count = -1;
-    int width = -1;
-    int height = -1;
-    const char *data_file_names[3];
+    if (strcmp(argv[1], "inference") == 0) {
+        if (argc < 6) {
+            printf("specify the bpm image file and 3 data files\n");
+            return 1;
+        }
 
-    srand(time(NULL));
+        const char *data_file_names[] = {argv[3], argv[4], argv[5]};
+        float *x = load_mnist_bmp(argv[2]);
 
-    load_mnist(&train_x, &train_y, &train_count, &test_x, &test_y, &test_count,
-               &width, &height);
+        printf("%d\n", inference(x, data_file_names));
+
+        return 0;
+    }
 
     if (strcmp(argv[1], "train") == 0) {
         if (argc < 5) {
             printf("specify 3 data files\n");
             return 1;
         }
-        data_file_names[0] = argv[2];
-        data_file_names[1] = argv[3];
-        data_file_names[2] = argv[4];
-        train(train_count, train_x, train_y, test_x, test_y, test_count,
-              data_file_names);
-        return 0;
-    }
 
-    if (strcmp(argv[1], "inference") == 0) {
-        if (argc < 6) {
-            printf("specify the bpm image file and 3 data files\n");
-            return 1;
-        }
-        float *x = load_mnist_bmp(argv[2]);
-        data_file_names[0] = argv[3];
-        data_file_names[1] = argv[4];
-        data_file_names[2] = argv[5];
-        printf("%d\n", inference(x, data_file_names));
+        const char *data_file_names[] = {argv[2], argv[3], argv[4]};
+
+        train(data_file_names);
 
         return 0;
     }
@@ -66,9 +51,19 @@ int main(int argc, char *argv[]) {
     return 1;
 }
 
-void train(int train_count, const float *train_x, const unsigned char *train_y,
-           const float *test_x, const unsigned char *test_y, int test_count,
-           const char **data_file_names) {
+void train(const char **data_file_names) {
+    float *train_x = NULL;
+    unsigned char *train_y = NULL;
+    int train_count = -1;
+    float *test_x = NULL;
+    unsigned char *test_y = NULL;
+    int test_count = -1;
+    int width = -1;
+    int height = -1;
+
+    load_mnist(&train_x, &train_y, &train_count, &test_x, &test_y, &test_count,
+               &width, &height);
+
     int epoch_num = 10;
     int n = 100;     // mini batch size
     float lr = 0.1;  // learning rate
@@ -101,6 +96,8 @@ void train(int train_count, const float *train_x, const unsigned char *train_y,
     float *y = malloc(sizeof(float) * NUM_DIGITS);
     int indexes[N];
     int index, i, j, k;
+
+    srand(time(NULL));
 
     rand_init(DIM_Y1 * IMAGE_SIZE, A1);
     rand_init(DIM_Y1, b1);
